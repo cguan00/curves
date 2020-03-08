@@ -3,19 +3,38 @@ from matrix import *
 
 
 def add_circle( points, cx, cy, cz, r, step ):
-    for i in range(1 / step):
-        x = r * math.cos(2 * math.pi * i) + cx
-        y = r * math.sin(2 * math.pi * i) + cy
-        add_point(points, x, y, 0)
-    return points
+    x0 = r + cx
+    y0 = cy
+
+    t = 0
+    while t <= 1:
+        x1 = r * math.cos(2 * math.pi * t) + cx;
+        y1 = r * math.sin(2 * math.pi * t) + cy;
+
+        add_edge(points, x0, y0, cz, x1, y1, cz)
+
+        x0 = x1
+        y0 = y1
+        t += step
 
 def add_curve( points, x0, y0, x1, y1, x2, y2, x3, y3, step, curve_type ):
-    pass
+    xcoefs = generate_curve_coefs(x0, x1, x2, x3, curve_type)[0]
+    ycoefs = generate_curve_coefs(y0, y1, y2, y3, curve_type)[0]
+
+    t = 0
+    while t <= 1:
+        x = t * (t * (xcoefs[0] * t + xcoefs[1]) + xcoefs[2]) + xcoefs[3]
+        y = t * (t * (ycoefs[0] * t + ycoefs[1]) + ycoefs[2]) + ycoefs[3]
+
+        add_edge(points, x0, y0, 0, x, y, 0)
+        x0 = x
+        y0 = y
+        t += step
 
 
 def draw_lines( matrix, screen, color ):
     if len(matrix) < 2:
-        print('Need at least 2 points to draw')
+        print 'Need at least 2 points to draw'
         return
 
     point = 0
